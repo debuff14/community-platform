@@ -1,0 +1,39 @@
+# ===== Java / Maven =====
+target/
+*.class
+*.jar
+!mvnw
+!.mvn/wrapper/maven-wrapper.jar
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ===== Node / 前端 =====
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== 日志 =====
+logs/
+*.log
+
+# ===== 用户上传的图片不入库 =====
+uploads/
+
+# ===== 本地敏感配置（数据库密码等） =====
+application-local.yml
+application-local.yaml
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+nul
