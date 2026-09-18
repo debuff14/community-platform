@@ -16,6 +16,9 @@ service.interceptors.request.use((config) => {
 
 service.interceptors.response.use(
   (response) => {
+    if (response.config.responseType === 'blob') {
+      return { blob: response.data, total: Number(response.headers['x-total-count'] || 0) }
+    }
     const res = response.data
     if (res.code !== 200) {
       ElMessage.error(res.msg || '操作失败')
