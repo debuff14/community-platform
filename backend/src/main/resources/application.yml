@@ -33,3 +33,7 @@ community:
   jwt:
     secret: community-platform-jwt-secret-key-please-change-this-in-production-2026
     expire-hours: 24
+  bill:
+    cron:
+      generate: "0 0 0 1 * ?"
+      remind: "0 0 0 14 * ?"

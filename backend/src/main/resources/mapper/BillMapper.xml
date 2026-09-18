@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.BillMapper">
+
+    <sql id="adminFilter">
+        <where>
+            <if test="status != null">
+                AND b.status = #{status}
+            </if>
+            <if test="building != null and building != ''">
+                AND u.building = #{building}
+            </if>
+            <if test="month != null and month != ''">
+                AND b.month = #{month}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectAdminPage" resultType="com.community.dto.BillVO">
+        SELECT b.id, b.user_id, u.username, u.building, u.room_no,
+               b.fee_type, b.amount, b.month, b.status, b.pay_time, b.create_time
+        FROM bill b
+        JOIN `user` u ON u.id = b.user_id
+        <include refid="adminFilter"/>
+        ORDER BY b.month DESC, b.create_time DESC, b.id DESC
+    </select>
+
+    <select id="selectAdminList" resultType="com.community.dto.BillVO">
+        SELECT b.id, b.user_id, u.username, u.building, u.room_no,
+               b.fee_type, b.amount, b.month, b.status, b.pay_time, b.create_time
+        FROM bill b
+        JOIN `user` u ON u.id = b.user_id
+        <include refid="adminFilter"/>
+        ORDER BY b.month DESC, b.create_time DESC, b.id DESC
+    </select>
+
+</mapper>

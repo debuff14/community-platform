@@ -59,6 +59,7 @@ CREATE TABLE `bill` (
   `create_time` DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_month_type` (`user_id`, `month`, `fee_type`),
   KEY `idx_user_status` (`user_id`, `status`),
   KEY `idx_month` (`month`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='账单表';
@@ -222,6 +223,19 @@ CREATE TABLE `operation_log` (
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
 
+-- ---------------------------------------------------------------------
+-- 13. 收费标准表（每月自动生成账单时按此标准计算金额）
+-- ---------------------------------------------------------------------
+DROP TABLE IF EXISTS `fee_standard`;
+CREATE TABLE `fee_standard` (
+  `id`          BIGINT        NOT NULL AUTO_INCREMENT COMMENT '标准ID',
+  `fee_type`    TINYINT       NOT NULL                COMMENT '费用类型 1物业费 2停车费 3水电费',
+  `amount`      DECIMAL(10,2) NOT NULL                COMMENT '每月标准金额',
+  `update_time` DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fee_type` (`fee_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收费标准表';
+
 -- =====================================================================
 -- 预置数据
 -- 说明：管理员账号不提供注册入口，由本脚本预置；
@@ -236,3 +250,8 @@ INSERT INTO `user` (`username`, `password`, `phone`, `building`, `room_no`, `rol
 INSERT INTO `notice` (`title`, `content`, `is_top`, `admin_id`) VALUES
 ('9月电梯维护通知', '各位业主：9月15日 9:00-12:00 将对1-3栋电梯进行年度维护，期间电梯暂停使用，请提前安排出行。给您带来不便，敬请谅解。', 1, 1),
 ('小区中秋游园活动通知', '中秋佳节将至，物业将于9月20日18:00在中心广场举办游园活动，现场有猜灯谜、DIY月饼等环节，欢迎各位业主携家人参加。', 0, 1);
+
+INSERT INTO `fee_standard` (`fee_type`, `amount`) VALUES
+(1, 350.00),
+(2, 300.00),
+(3, 200.00);

@@ -23,7 +23,7 @@ const routes = [
       { path: 'notice', name: 'NoticeList', component: () => import('@/views/owner/NoticeList.vue') },
       { path: 'notice/:id', name: 'NoticeDetail', component: () => import('@/views/owner/NoticeDetail.vue') },
       { path: 'profile', name: 'Profile', component: () => import('@/views/owner/Profile.vue') },
-      { path: 'pay', component: () => import('@/views/Placeholder.vue'), meta: { title: '我的缴费' } },
+      { path: 'pay', name: 'MyBill', component: () => import('@/views/owner/Pay.vue') },
       { path: 'repair', component: () => import('@/views/Placeholder.vue'), meta: { title: '报修服务' } },
       { path: 'market', component: () => import('@/views/Placeholder.vue'), meta: { title: '二手市场' } },
       { path: 'visitor', component: () => import('@/views/Placeholder.vue'), meta: { title: '访客登记' } },
@@ -38,7 +38,7 @@ const routes = [
     children: [
       { path: 'dashboard', component: () => import('@/views/Placeholder.vue'), meta: { title: '数据看板' } },
       { path: 'notice', name: 'AdminNotice', component: () => import('@/views/admin/NoticeManage.vue'), meta: { title: '公告管理' } },
-      { path: 'bill', component: () => import('@/views/Placeholder.vue'), meta: { title: '缴费管理' } },
+      { path: 'bill', name: 'AdminBill', component: () => import('@/views/admin/BillManage.vue'), meta: { title: '缴费管理' } },
       { path: 'repair', component: () => import('@/views/Placeholder.vue'), meta: { title: '工单管理' } },
       { path: 'goods', component: () => import('@/views/Placeholder.vue'), meta: { title: '商品审核' } },
       { path: 'visitor', component: () => import('@/views/Placeholder.vue'), meta: { title: '访客管理' } },
