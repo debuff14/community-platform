@@ -20,6 +20,10 @@ spring:
       database: 0
   jackson:
     time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
 
 mybatis-plus:
   configuration:
@@ -37,3 +41,5 @@ community:
     cron:
       generate: "0 0 0 1 * ?"
       remind: "0 0 0 14 * ?"
+  upload:
+    dir: uploads
