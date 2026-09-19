@@ -14,6 +14,34 @@
           <el-menu-item index="/visitor">访客登记</el-menu-item>
           <el-menu-item index="/ai">AI 客服</el-menu-item>
         </el-menu>
+        <el-popover placement="bottom-end" :width="360" trigger="click" @show="loadMessages">
+          <template #reference>
+            <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99" class="bell-badge">
+              <el-icon :size="20" class="bell-icon"><Bell /></el-icon>
+            </el-badge>
+          </template>
+          <div class="message-panel">
+            <div class="message-header">
+              <span>消息通知</span>
+              <el-button link type="primary" size="small" :disabled="unreadCount === 0" @click="onReadAll">
+                全部已读
+              </el-button>
+            </div>
+            <el-scrollbar max-height="320px">
+              <div v-if="messages.length === 0" class="message-empty">暂无消息</div>
+              <div
+                v-for="msg in messages"
+                :key="msg.id"
+                class="message-item"
+                :class="{ unread: msg.isRead === 0 }"
+                @click="onMessageClick(msg)"
+              >
+                <div class="message-content">{{ msg.content }}</div>
+                <div class="message-time">{{ msg.createTime }}</div>
+              </div>
+            </el-scrollbar>
+          </div>
+        </el-popover>
         <el-dropdown trigger="click" @command="handleCommand">
           <span class="user-entry">
             <el-avatar :size="32" class="avatar">
@@ -66,11 +94,12 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { UserFilled, ArrowDown } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { UserFilled, ArrowDown, Bell } from '@element-plus/icons-vue'
 import { changePassword } from '@/api/user'
+import { getMessagePage, getUnreadCount, markAllRead } from '@/api/message'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
@@ -155,6 +184,94 @@ const handleCommand = async (command) => {
     }
   }
 }
+
+const unreadCount = ref(0)
+const messages = ref([])
+let socket = null
+let reconnectTimer = null
+
+const loadUnread = async () => {
+  try {
+    unreadCount.value = await getUnreadCount()
+  } catch (e) {
+    /* 忽略 */
+  }
+}
+
+const loadMessages = async () => {
+  try {
+    const data = await getMessagePage({ page: 1, size: 20 })
+    messages.value = data.records
+  } catch (e) {
+    /* 忽略 */
+  }
+}
+
+const onReadAll = async () => {
+  try {
+    await markAllRead()
+    unreadCount.value = 0
+    messages.value = messages.value.map((msg) => ({ ...msg, isRead: 1 }))
+    ElMessage.success('已全部标记为已读')
+  } catch (e) {
+    /* 错误提示由拦截器统一处理 */
+  }
+}
+
+const onMessageClick = (msg) => {
+  if (msg.type === 1 && msg.relatedId) {
+    router.push(`/repair/${msg.relatedId}`)
+  }
+}
+
+const connectSocket = () => {
+  const token = store.token
+  if (!token) return
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+  socket = new WebSocket(`${protocol}://${window.location.host}/api/ws?token=${encodeURIComponent(token)}`)
+  socket.onopen = () => {
+    loadUnread()
+  }
+  socket.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data)
+      if (typeof data.unreadCount === 'number') {
+        unreadCount.value = data.unreadCount
+      }
+      if (data.content) {
+        ElNotification({ title: '新的站内消息', message: data.content, type: 'info', duration: 4000 })
+      }
+    } catch (e) {
+      /* 忽略非 JSON 消息 */
+    }
+  }
+  socket.onclose = () => {
+    scheduleReconnect()
+  }
+  socket.onerror = () => {
+    socket?.close()
+  }
+}
+
+const scheduleReconnect = () => {
+  if (reconnectTimer) return
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    connectSocket()
+  }, 3000)
+}
+
+onMounted(() => {
+  loadUnread()
+  connectSocket()
+})
+
+onBeforeUnmount(() => {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer)
+  }
+  socket?.close()
+})
 </script>
 
 <style scoped>
@@ -231,5 +348,57 @@ const handleCommand = async (command) => {
 
 .main {
   padding: 20px 16px;
+}
+
+.bell-badge {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.bell-icon {
+  color: #606266;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.message-empty {
+  text-align: center;
+  color: #909399;
+  padding: 24px 0;
+  font-size: 13px;
+}
+
+.message-item {
+  padding: 10px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.message-item:hover {
+  background: #f5f7fa;
+}
+
+.message-item.unread .message-content {
+  font-weight: 600;
+}
+
+.message-content {
+  font-size: 13px;
+  color: #303133;
+  line-height: 1.5;
+}
+
+.message-time {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
 }
 </style>
