@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.RepairOrderMapper">
+
+    <select id="selectAdminPage" resultType="com.community.dto.RepairOrderVO">
+        SELECT r.id, r.user_id, u.username, u.building, u.room_no,
+               r.type, r.description, r.urgency, r.images, r.status, r.result,
+               r.accept_time, r.finish_time, r.cancel_time, r.create_time,
+               rc.star AS star, rc.content AS comment_content
+        FROM repair_order r
+        JOIN `user` u ON u.id = r.user_id
+        LEFT JOIN repair_comment rc ON rc.order_id = r.id
+        <where>
+            <choose>
+                <when test="status != null">
+                    AND r.status = #{status}
+                </when>
+                <otherwise>
+                    AND r.status != 5
+                </otherwise>
+            </choose>
+            <if test="type != null">
+                AND r.type = #{type}
+            </if>
+            <if test="urgency != null">
+                AND r.urgency = #{urgency}
+            </if>
+        </where>
+        ORDER BY r.urgency DESC, r.create_time DESC, r.id DESC
+    </select>
+
+    <select id="selectDetailById" resultType="com.community.dto.RepairOrderVO">
+        SELECT r.id, r.user_id, u.username, u.building, u.room_no,
+               r.type, r.description, r.urgency, r.images, r.status, r.result,
+               r.accept_time, r.finish_time, r.cancel_time, r.create_time,
+               rc.star AS star, rc.content AS comment_content
+        FROM repair_order r
+        JOIN `user` u ON u.id = r.user_id
+        LEFT JOIN repair_comment rc ON rc.order_id = r.id
+        WHERE r.id = #{id}
+    </select>
+
+</mapper>
