@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.GoodsMapper">
+
+    <sql id="goodsColumns">
+        g.id, g.seller_id, g.name, g.description, g.price, g.category, g.image,
+        g.status, g.reject_reason, g.create_time, g.update_time,
+        u.username, u.building, u.room_no
+    </sql>
+
+    <select id="selectMarketPage" resultType="com.community.dto.GoodsVO">
+        SELECT <include refid="goodsColumns"/>
+        FROM goods g
+        JOIN `user` u ON u.id = g.seller_id
+        WHERE g.status = 1
+        <if test="category != null">
+            AND g.category = #{category}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND g.name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        ORDER BY g.create_time DESC, g.id DESC
+    </select>
+
+    <select id="selectAdminPage" resultType="com.community.dto.GoodsVO">
+        SELECT <include refid="goodsColumns"/>
+        FROM goods g
+        JOIN `user` u ON u.id = g.seller_id
+        <where>
+            <if test="status != null">
+                AND g.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND g.name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY g.create_time DESC, g.id DESC
+    </select>
+
+    <select id="selectGoodsDetail" resultType="com.community.dto.GoodsVO">
+        SELECT <include refid="goodsColumns"/>
+        FROM goods g
+        JOIN `user` u ON u.id = g.seller_id
+        WHERE g.id = #{id}
+    </select>
+
+</mapper>

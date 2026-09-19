@@ -27,8 +27,11 @@ const routes = [
       { path: 'repair', name: 'MyRepair', component: () => import('@/views/owner/RepairList.vue') },
       { path: 'repair/new', name: 'RepairCreate', component: () => import('@/views/owner/RepairCreate.vue') },
       { path: 'repair/:id', name: 'RepairDetail', component: () => import('@/views/owner/RepairDetail.vue') },
-      { path: 'market', component: () => import('@/views/Placeholder.vue'), meta: { title: '二手市场' } },
-      { path: 'visitor', component: () => import('@/views/Placeholder.vue'), meta: { title: '访客登记' } },
+      { path: 'market', name: 'Market', component: () => import('@/views/owner/MarketList.vue') },
+      { path: 'market/publish', name: 'GoodsPublish', component: () => import('@/views/owner/GoodsPublish.vue') },
+      { path: 'market/:id', name: 'GoodsDetail', component: () => import('@/views/owner/GoodsDetail.vue') },
+      { path: 'my-goods', name: 'MyGoods', component: () => import('@/views/owner/MyGoods.vue') },
+      { path: 'visitor', name: 'MyVisitor', component: () => import('@/views/owner/VisitorList.vue') },
       { path: 'ai', component: () => import('@/views/Placeholder.vue'), meta: { title: 'AI 客服' } }
     ]
   },
@@ -42,8 +45,8 @@ const routes = [
       { path: 'notice', name: 'AdminNotice', component: () => import('@/views/admin/NoticeManage.vue'), meta: { title: '公告管理' } },
       { path: 'bill', name: 'AdminBill', component: () => import('@/views/admin/BillManage.vue'), meta: { title: '缴费管理' } },
       { path: 'repair', name: 'AdminRepair', component: () => import('@/views/admin/RepairManage.vue'), meta: { title: '工单管理' } },
-      { path: 'goods', component: () => import('@/views/Placeholder.vue'), meta: { title: '商品审核' } },
-      { path: 'visitor', component: () => import('@/views/Placeholder.vue'), meta: { title: '访客管理' } },
+      { path: 'goods', name: 'AdminGoods', component: () => import('@/views/admin/GoodsManage.vue'), meta: { title: '商品审核' } },
+      { path: 'visitor', name: 'AdminVisitor', component: () => import('@/views/admin/VisitorManage.vue'), meta: { title: '访客管理' } },
       { path: 'knowledge', component: () => import('@/views/Placeholder.vue'), meta: { title: 'AI 知识库' } },
       { path: 'log', component: () => import('@/views/Placeholder.vue'), meta: { title: '操作日志' } }
     ]
